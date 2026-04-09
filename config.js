@@ -14,4 +14,4 @@ const firebaseConfig = {
 
 // 2. 구글 앱스 스크립트(최종 답안지 제출용) 주소
 // 🚨 "..." 부분에 선생님의 진짜 구글 시트 배포 주소를 꼭 넣어주세요!
-const BASE_SCRIPT_URL = "...";
+const BASE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzWWl7uK64KDQY8_v23EWXi1v3dY3XNbgeaB657yTdq5WWUu5Hfi2UqOTJFXxJacUAB/exec";
