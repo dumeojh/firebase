@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -36,12 +34,10 @@
         .row-active { background-color: #fff; color: #2c3e50; } 
         tr:hover { background-color: #f1f7fd; }
 
-        /* 상태 뱃지 디자인 */
         .status-ing { color: #e67e22; font-weight: bold; background: #fdf2e9; padding: 4px 10px; border-radius: 20px; font-size: 0.9em; }
         .status-done { color: #27ae60; font-weight: bold; background: #e9f7ef; padding: 4px 10px; border-radius: 20px; font-size: 0.9em; }
         .status-waiting { color: #bdc3c7; font-size: 0.9em; }
         
-        /* 🔥 실시간 이탈 중인 학생을 위한 깜빡임 디자인 */
         @keyframes blink { 50% { opacity: 0.4; } }
         .status-out { color: white; font-weight: bold; background: #e74c3c; padding: 4px 10px; border-radius: 20px; font-size: 0.9em; animation: blink 0.8s infinite; box-shadow: 0 0 8px rgba(231,76,60,0.6); }
 
@@ -105,46 +101,25 @@
     </table>
 </div>
 
+<script src="config.js"></script>
+
 <script>
-    /** ============================================================================
-     * 🚨 [매우 중요] 아까 복사해두신 Firebase Config 코드를 아래에 덮어쓰세요! 🚨
-     * 학생용 시험지에 넣었던 것과 완전히 똑같은 코드를 넣으시면 됩니다.
-     * ============================================================================ */
-/** ============================================================================
-     * 🚨 [수정 완료] Firebase Config 
-     * ============================================================================ */
-// config.js에서 설정값을 불러와서 파이어베이스 엔진 시동 켜기
+    // 파이어베이스 엔진 시동 켜기
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-
-
-
-    
-    let myStatusRef = null; // 현재 학생의 개인 DB 연결선
-
-
-
-
-    
-    // ============================================================================
-    
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    // ============================================================================
-
-    let globalStudentData = {}; // 파이어베이스에서 받은 전체 데이터를 저장할 공간
+    let globalStudentData = {}; 
 
     document.addEventListener("DOMContentLoaded", () => {
         const today = new Date();
         document.getElementById('filterDate').value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
         
-        // 🔥 파이어베이스 실시간 수신 대기 (데이터가 변할 때마다 자동으로 실행됨)
+        // 🔥 파이어베이스 실시간 수신 대기
         db.ref('live_status').on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 globalStudentData = data;
-                renderTable(); // 데이터가 바뀌면 표를 즉시 다시 그림
+                renderTable(); 
                 
                 const now = new Date();
                 document.getElementById('lastUpdated').innerText = `마지막 수신: ${now.toLocaleTimeString()}.${now.getMilliseconds()} (초고속 실시간 연결 됨)`;
@@ -162,7 +137,6 @@
             return; 
         }
 
-        // 해당 학년/반 학생만 필터링해서 Map에 저장
         const studentMap = {};
         for (const key in globalStudentData) {
             const student = globalStudentData[key];
@@ -188,7 +162,6 @@
             let warningCount = student['경고횟수'] || 0;
             let displayRemark = student['비고'] || '정상상태';
 
-            // 🔥 현재 상태 뱃지 생성 (이탈 중일 때 빨간색 깜빡임 적용!)
             let statusHtml = "";
             if (statusRaw === "이탈 중") {
                 statusHtml = `<span class="status-out">🚨 이탈 중! (화면 벗어남)</span>`;
@@ -198,7 +171,6 @@
                 statusHtml = `<span class="status-ing">🟢 진행 중</span>`;
             }
 
-            // 비고 글자색 지정
             let remarkColor = "#555";
             if (displayRemark.includes("강제제출")) remarkColor = "#e74c3c";
             else if (displayRemark.includes("시간초과")) remarkColor = "#8e44ad";
@@ -206,7 +178,6 @@
             else if (warningCount > 0) remarkColor = "#e67e22";
             else if (displayRemark.includes("정상")) remarkColor = "#27ae60";
 
-            // 강제제출이 아니고, 제출완료도 아닌데 경고가 있으면 비고란에 알림 표시
             if (warningCount > 0 && !displayRemark.includes("제출") && statusRaw !== "제출 완료") {
                 displayRemark = `⚠️ ${warningCount}회 화면이탈 누적`;
             }
@@ -224,12 +195,10 @@
             return tr;
         };
 
-        // 1번부터 35번까지 렌더링
         for (let i = 1; i <= 35; i++) {
             tbody.appendChild(renderRow(i, studentMap[i], false));
         }
 
-        // 번호 입력 오류 학생 렌더링
         const errorNums = Object.keys(studentMap).map(Number).filter(n => n > 35 || n < 1).sort((a, b) => a - b);
         if (errorNums.length > 0) {
             const trSep = document.createElement('tr');
