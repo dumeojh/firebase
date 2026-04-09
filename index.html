@@ -181,20 +181,24 @@
     /** ============================================================================
      * 🚨 [매우 중요] 아까 복사해두신 Firebase Config 코드를 아래에 덮어쓰세요! 🚨
      * ============================================================================ */
+/** ============================================================================
+     * 🚨 [수정 완료] Firebase Config 
+     * ============================================================================ */
     const firebaseConfig = {
         apiKey: "AIzaSyAi_zYqV2PtWNsy61zkxKADxirWftcBfY4",
-    authDomain: "project-94b9c.firebaseapp.com",
-    projectId: "project-94b9c",
-    storageBucket: "project-94b9c.firebasestorage.app",
-    messagingSenderId: "619238103499",
-    appId: "1:619238103499:web:f25b6406a913954a87fe4e",
-        authDomain: "...",
-        databaseURL: "...",
-        projectId: "...",
-        storageBucket: "...",
-        messagingSenderId: "...",
-        appId: "..."
+        authDomain: "project-94b9c.firebaseapp.com",
+        databaseURL: "https://project-94b9c-default-rtdb.firebaseio.com", /* 👈 빠져있던 핵심 주소 추가 완료! */
+        projectId: "project-94b9c",
+        storageBucket: "project-94b9c.firebasestorage.app",
+        messagingSenderId: "619238103499",
+        appId: "1:619238103499:web:f25b6406a913954a87fe4e"
     };
+    
+    // 파이어베이스 엔진 시동 켜기
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    let myStatusRef = null; // 현재 학생의 개인 DB 연결선
+    // ============================================================================
     
     // 파이어베이스 엔진 시동 켜기
     firebase.initializeApp(firebaseConfig);
