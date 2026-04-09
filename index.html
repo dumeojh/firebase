@@ -16,7 +16,6 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <style>
-        /* 기존 디자인 유지 */
         :root { --primary: #2c3e50; --accent: #3498db; --bg: #f8f9fa; }
         body { font-family: 'Pretendard', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
         .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
@@ -176,26 +175,17 @@
     </div>
 </div>
 
-
 <script src="config.js"></script>    
+
 <script>
-    // 1. config.js에서 설정값을 불러와서 파이어베이스 엔진 시동 켜기 (딱 1번만!)
+    // 💡 1. config.js에서 설정값을 불러와서 파이어베이스 엔진 시동 켜기 (단 한 번만!)
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     let myStatusRef = null; 
 
-    // 2. 관리자 코드 및 구글 시트 주소 세팅
+    // 💡 2. 관리자 코드 및 구글 시트 주소 세팅
     const MASTER_EXAM_CODE = "2201"; 
-    const GOOGLE_SCRIPT_URL = BASE_SCRIPT_URL; // 최종 답안지 전송용 구글시트 주소
-
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    // ... (아래는 기존 코드 그대로 유지) ...
-    
-
-
-
-    
-    const GOOGLE_SCRIPT_URL = BASE_SCRIPT_URL; // 최종 답안지 전송용 구글시트 주소
+    const GOOGLE_SCRIPT_URL = BASE_SCRIPT_URL; // config.js의 주소 사용
 
     document.addEventListener('contextmenu', e => e.preventDefault());
     document.addEventListener('copy', e => e.preventDefault());
@@ -226,7 +216,6 @@
         isOut = true; 
         warningCount++;
         
-        // 🔥 파이어베이스로 나갔다는 신호 즉각 발송 (0.1초 반응)
         if (myStatusRef) {
             myStatusRef.update({
                 상태: "이탈 중",
@@ -242,7 +231,6 @@
     });
 
     window.addEventListener('blur', function() {
-        // 선생님이 요청하신 '키보드 방어 로직' 적용 완료
         const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
         if (activeTag === 'input' || activeTag === 'textarea' || activeTag === 'select') {
             return; 
@@ -254,14 +242,12 @@
         }, 200); 
     });
 
-    // 💡 학생이 다시 시험지로 돌아왔을 때 작동하는 코드
     window.addEventListener('focus', function() {
         if (isExamStarted) {
             setTimeout(() => {
                 if (document.hasFocus() && !document.hidden) {
                     isOut = false; 
                     
-                    // 🔥 파이어베이스로 다시 돌아왔다는 신호 즉각 발송
                     if (myStatusRef && warningCount < 30) {
                         myStatusRef.update({
                             상태: "진행 중",
@@ -292,7 +278,6 @@
             return; 
         }
 
-        // 파이어베이스에 경고 횟수 및 비고란 업데이트
         if (myStatusRef) {
             myStatusRef.update({ 비고: msg });
         }
@@ -325,7 +310,6 @@
         }, 1000);
     }
 
-    /** [시험 시작] 파이어베이스 연결 포함 **/
     function startExam() {
         const inputCode = document.getElementById('examCode').value;
         if(inputCode !== MASTER_EXAM_CODE) {
@@ -354,7 +338,6 @@
         
         isExamStarted = true; 
 
-        // 🔥 파이어베이스 학생용 방 생성 및 첫 신호(진행 중) 쏘기
         myStatusRef = db.ref(`live_status/${grade}_${clsNum}_${num}`);
         myStatusRef.set({
             학년: grade,
@@ -371,7 +354,6 @@
         startTimer();
     }
 
-    // 📈 차트 그리기 및 분석 (기존 코드 완벽 동일)
     let chartInstance = null;
     function runAnalysis() {
         const area = document.getElementById('funcArea').value;
@@ -444,7 +426,6 @@
         });
     }
 
-    // 📥 최종 제출 (하이브리드: 답안지는 구글 시트로, 상태는 파이어베이스로!)
     async function saveToSheets(isForceSubmit = false, type = "정상제출") {
         const grade = document.getElementById('gradeSelect').value;
         const clsNum = document.getElementById('classSelect').value;
@@ -466,7 +447,6 @@
         btn.disabled = true; btn.innerText = "제출 중...";
         isExamStarted = false; 
 
-        // 🔥 파이어베이스에 최종 제출 상태 보고
         if (myStatusRef) {
             myStatusRef.update({
                 상태: "제출 완료",
@@ -498,7 +478,6 @@
         };
 
         try {
-            // 구글 시트로 답안지 쏘기!
             await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST', mode: 'no-cors',
                 body: JSON.stringify(payload)
